@@ -1,4 +1,5 @@
 import string
+from abc import ABC, abstractmethod
 
 
 def letter_range(ch1: str, ch2: str) -> str:
@@ -12,7 +13,15 @@ RUS_LETTERS_LOWER = letter_range("а", "я")
 ALL_LETTERS = [ENG_LETTERS_UPPER, ENG_LETTERS_LOWER, RUS_LETTERS_UPPER, RUS_LETTERS_LOWER]
 
 
-def shift(ch: str, shift_amount: int):
+def get_index(ch: str) -> int:
+    for letters in ALL_LETTERS:
+        index = letters.find(ch)
+        if index != -1:
+            return index
+    return -1
+
+
+def shift(ch: str, shift_amount: int) -> str:
     for letters in ALL_LETTERS:
         index = letters.find(ch)
         if index != -1:
@@ -22,9 +31,25 @@ def shift(ch: str, shift_amount: int):
     return ch
 
 
-def encode(text: str) -> str:
-    return ''.join(shift(ch, 3) for ch in text)
+class BaseEncoder(ABC):
+    _key = None
 
+    def __init__(self, key):
+        self.key = key
 
-def decode(text: str) -> str:
-    return ''.join(shift(ch, -3) for ch in text)
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    @abstractmethod
+    def key(self, new_key):
+        self._key = new_key
+
+    @abstractmethod
+    def encode(self, text: str):
+        pass
+
+    @abstractmethod
+    def decode(self, text: str):
+        pass
